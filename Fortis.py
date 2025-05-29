@@ -5,6 +5,7 @@ from datetime import datetime
 import pandas as pd
 from docx import Document
 import io
+import re
 
 # Set your assistant ID here
 ASSISTANT_ID = "asst_vr6ZFdxJVO4kd4oukqMUTk9m"
@@ -82,10 +83,19 @@ if uploaded_file:
         st.text_area("Report Output", value=report_text, height=500)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        # Create a Word document in memory
+        # Create a Word document in memory, bolding any **heading** lines
         doc = Document()
         for line in report_text.split("\n"):
-            doc.add_paragraph(line)
+            # If the line is wrapped in **…**, make it bold
+            m = re.match(r"^\*\*(.+)\*\*$", line.strip())
+            if m:
+                heading = m.group(1).strip()
+                p = doc.add_paragraph()
+                run = p.add_run(heading)
+                run.bold = True
+            else:
+                doc.add_paragraph(line)
+
 
         word_file = io.BytesIO()
         doc.save(word_file)
