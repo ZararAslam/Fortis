@@ -83,20 +83,20 @@ if uploaded_file:
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         # Create a Word document in memory
-doc = Document()
-for line in report_text.split("\n"):
-    doc.add_paragraph(line)
+        doc = Document()
+        for line in report_text.split("\n"):
+            doc.add_paragraph(line)
 
-word_file = io.BytesIO()
-doc.save(word_file)
-word_file.seek(0)
+        word_file = io.BytesIO()
+        doc.save(word_file)
+        word_file.seek(0)
 
-filename = f"financial_report_{timestamp}.docx"
+        filename = f"financial_report_{timestamp}.docx"
 
-st.download_button(
-    label="📥 Download Report (.docx)",
-    data=word_file,
-    file_name=filename,
-    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-)
+        st.download_button(
+            label="📥 Download Report (.docx)",
+            data=word_file,
+            file_name=filename,
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
 
