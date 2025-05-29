@@ -20,6 +20,10 @@ if uploaded_file:
     with st.spinner("Reading file and preparing report..."):
         client_input = uploaded_file.read().decode("utf-8")
 
+        # Inject today's date into the message
+        today_date = datetime.now().strftime("%d %B %Y")
+        system_injected_text = f"Today's date is {today_date}.\n\n{client_input}"
+
         # Create a new thread for this session
         thread = openai.beta.threads.create()
 
