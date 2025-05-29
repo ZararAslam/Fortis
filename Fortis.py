@@ -84,18 +84,27 @@ if uploaded_file:
 
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        # Create a Word document in memory, bolding any **heading** lines
+        # Create a Word document in memory, converting all **bold** spans to real bold text
         doc = Document()
-        for line in report_text.split("\n"):
-            # If the line is wrapped in **…**, make it bold
-            m = re.match(r"^\*\*(.+)\*\*$", line.strip())
-            if m:
-                heading = m.group(1).strip()
-                p = doc.add_paragraph()
-                run = p.add_run(heading)
+        bold_pattern = re.compile(r"\*\*(.+?)\*\*")
+
+        for line in report_text.splitlines():
+            p = doc.add_paragraph()
+            last_end = 0
+
+            for m in bold_pattern.finditer(line):
+                # add text before the **…**
+                if m.start() > last_end:
+                    p.add_run(line[last_end:m.start()])
+                # add the bold portion
+                bold_text = m.group(1)
+                run = p.add_run(bold_text)
                 run.bold = True
-            else:
-                doc.add_paragraph(line)
+                last_end = m.end()
+
+            # add any remaining text after the last match
+            if last_end < len(line):
+                p.add_run(line[last_end:])
 
 
         word_file = io.BytesIO()
