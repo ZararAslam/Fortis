@@ -78,9 +78,10 @@ if uploaded_file:
         messages = openai.beta.threads.messages.list(thread_id=thread.id)
         report_text = messages.data[0].content[0].text.value
 
-        # Display and allow download
         st.subheader("📄 Generated Report")
-        st.text_area("Report Output", value=report_text, height=500)
+        # Render the report as Markdown so **bold** gets formatted correctly
+        st.markdown(report_text)
+
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         # Create a Word document in memory, bolding any **heading** lines
