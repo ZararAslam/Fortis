@@ -82,11 +82,21 @@ if uploaded_file:
         st.text_area("Report Output", value=report_text, height=500)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"financial_report_{timestamp}.txt"
+        # Create a Word document in memory
+doc = Document()
+for line in report_text.split("\n"):
+    doc.add_paragraph(line)
 
-        st.download_button(
-            label="📥 Download Report",
-            data=report_text,
-            file_name=filename,
-            mime="text/plain"
-        )
+word_file = io.BytesIO()
+doc.save(word_file)
+word_file.seek(0)
+
+filename = f"financial_report_{timestamp}.docx"
+
+st.download_button(
+    label="📥 Download Report (.docx)",
+    data=word_file,
+    file_name=filename,
+    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
+
