@@ -3,7 +3,7 @@ import openai
 import os
 from datetime import datetime
 import pandas as pd
-import docx  # for .docx support
+from docx import Document
 import io
 
 # Set your assistant ID here
