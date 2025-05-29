@@ -31,7 +31,7 @@ if uploaded_file:
         openai.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
-            content=client_input
+            content=system_injected_text
         )
 
         # Run the assistant
