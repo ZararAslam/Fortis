@@ -45,61 +45,45 @@ if uploaded_file:
         st.error("Unsupported file format or failed to extract text.")
         st.stop()
 
-    # 2️⃣ Only run the API + DOCX creation once
+    # 2️⃣ Show a Generate Report button
     if "report_generated" not in st.session_state:
-        with st.spinner("Generating report…"):
-            # Inject today's date
-            today_date = datetime.now().strftime("%d %B %Y")
-            system_injected_text = f"Today's date is {today_date}.\n\n{client_input}"
+        if st.button("🚀 Generate Report"):
+            with st.spinner("Generating report…"):
+                # ── MOVE ALL YOUR EXISTING generation logic HERE ──
+                # Inject today's date
+                today_date = datetime.now().strftime("%d %B %Y")
+                system_injected_text = f"Today's date is {today_date}.\n\n{client_input}"
 
-            # 🔹 YOUR OpenAI THREAD/RUN LOGIC 🔹
-            thread = openai.beta.threads.create()
-            openai.beta.threads.messages.create(
-                thread_id=thread.id,
-                role="user",
-                content=system_injected_text
-            )
-            run = openai.beta.threads.runs.create(
-                thread_id=thread.id,
-                assistant_id=ASSISTANT_ID
-            )
-            while True:
-                status = openai.beta.threads.runs.retrieve(
-                    thread_id=thread.id, run_id=run.id
+                thread = openai.beta.threads.create()
+                openai.beta.threads.messages.create(
+                    thread_id=thread.id,
+                    role="user",
+                    content=system_injected_text
                 )
-                if status.status == "completed":
-                    break
-                elif status.status == "failed":
-                    st.error("Report generation failed. Please try again.")
-                    st.stop()
+                run = openai.beta.threads.runs.create(
+                    thread_id=thread.id,
+                    assistant_id=ASSISTANT_ID
+                )
+                while True:
+                    status = openai.beta.threads.runs.retrieve(
+                        thread_id=thread.id, run_id=run.id
+                    )
+                    if status.status == "completed":
+                        break
+                    elif status.status == "failed":
+                        st.error("Report generation failed. Please try again.")
+                        st.stop()
 
-            messages = openai.beta.threads.messages.list(thread_id=thread.id)
-            report_text = messages.data[0].content[0].text.value
+                messages = openai.beta.threads.messages.list(thread_id=thread.id)
+                report_text = messages.data[0].content[0].text.value
 
-            # ── Markdown normalisation (your regex) ──
-            report_text = re.sub(r"^\*\*(.+?)\*\*$", r"## \1",
-                                 report_text, flags=re.MULTILINE)
-            report_text = re.sub(r"^(## .+?)\s*\n+", r"\1\n\n",
-                                 report_text, flags=re.MULTILINE)
+                # ── Your regex normalization & DOCX build here ──
+                # … (exactly as before) …
 
-            # Build the in-memory DOCX
-            doc = Document()
-            bold_pattern = re.compile(r"\*\*(.+?)\*\*")
-            for line in report_text.splitlines():
-                p = doc.add_paragraph(); last_end = 0
-                for m in bold_pattern.finditer(line):
-                    if m.start() > last_end:
-                        p.add_run(line[last_end:m.start()])
-                    run = p.add_run(m.group(1)); run.bold = True
-                    last_end = m.end()
-                if last_end < len(line):
-                    p.add_run(line[last_end:])
-            word_file = io.BytesIO(); doc.save(word_file); word_file.seek(0)
-
-            # Store in session
-            st.session_state.report_text = report_text
-            st.session_state.word_file   = word_file
-            st.session_state.report_generated = True
+                # Store results in session_state
+                st.session_state.report_text      = report_text
+                st.session_state.word_file        = word_file
+                st.session_state.report_generated = True
 
     # 3️⃣ Now *always* render from session_state
     st.subheader("📄 Generated Report")
