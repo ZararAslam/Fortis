@@ -106,8 +106,8 @@ if uploaded_file:
                     report_text, flags=re.MULTILINE
                 )
                 report_text = re.sub(
-                    r"^(## .+?)\s*\n+", r"\1\n\n",
-                    report_text, flags=re.MULTILINE
+                r"^(## .+)$", r"\n\1\n",
+                report_text, flags=re.MULTILINE
                 )
 
                 # ── Ensure a blank line after any numbered heading ──
@@ -122,15 +122,27 @@ if uploaded_file:
                 doc = Document()
                 bold_pattern = re.compile(r"\*\*(.+?)\*\*")
                 for line in report_text.splitlines():
-                    p = doc.add_paragraph()
-                    last_end = 0
-                    for m in bold_pattern.finditer(line):
-                        if m.start() > last_end:
-                            p.add_run(line[last_end:m.start()])
-                        run = p.add_run(m.group(1)); run.bold = True
-                        last_end = m.end()
-                    if last_end < len(line):
-                        p.add_run(line[last_end:])
+                  if line.startswith("## "):
+                      # genuine Word heading, strip the "## "
+                      doc.add_heading(line[3:].strip(), level=2)
+                  elif line.startswith("- "):
+                      # bullet list
+                      doc.add_paragraph(line[2:].strip(), style="List Bullet")
+                  elif not line.strip():
+                      # blank line → keep a paragraph break
+                      doc.add_paragraph()
+                  else:
+                      # normal paragraph
+                      p = doc.add_paragraph()
+                      # convert any **bold** spans inside this line
+                      last = 0
+                      for m in bold_pattern.finditer(line):
+                          if m.start()>last:
+                              p.add_run(line[last:m.start()])
+                          run = p.add_run(m.group(1)); run.bold = True
+                          last = m.end()
+                      if last < len(line):
+                          p.add_run(line[last:])
                 word_file = io.BytesIO()
                 doc.save(word_file)
                 word_file.seek(0)
