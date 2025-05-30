@@ -49,6 +49,9 @@ if uploaded_file:
     if not client_input:
         st.error("Unsupported file format or failed to extract text.")
         st.stop()
+    # 🔍 Show raw client data in an expander for review
+    with st.expander("📋 View Uploaded Client Data"):
+        st.text(client_input)
 
     # 2️⃣ If we haven’t generated yet, show a Generate button
     if "report_generated" not in st.session_state:
