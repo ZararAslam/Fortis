@@ -3,6 +3,7 @@ import openai
 import os
 from datetime import datetime
 import pandas as pd
+import docx
 from docx import Document
 import io
 import re
