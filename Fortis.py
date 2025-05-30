@@ -8,10 +8,6 @@ from docx import Document
 import io
 import re
 
-# New imports for footer styling
-from docx.shared import Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-
 # Set your assistant ID here
 ASSISTANT_ID = "asst_vr6ZFdxJVO4kd4oukqMUTk9m"
 
@@ -114,14 +110,6 @@ if uploaded_file:
                     report_text, flags=re.MULTILINE
                 )
 
-                # ── Ensure a blank line after any numbered heading ──
-                report_text = re.sub(
-                    r'^(?P<h>\d+\.\s[^\n]+)$',
-                    r'\g<h>\n\n',
-                    report_text,
-                    flags=re.MULTILINE
-                )
-
                 # Build the in-memory DOCX
                 doc = Document()
                 bold_pattern = re.compile(r"\*\*(.+?)\*\*")
@@ -131,22 +119,10 @@ if uploaded_file:
                     for m in bold_pattern.finditer(line):
                         if m.start() > last_end:
                             p.add_run(line[last_end:m.start()])
-                        run = p.add_run(m.group(1))
-                        run.bold = True
+                        run = p.add_run(m.group(1)); run.bold = True
                         last_end = m.end()
                     if last_end < len(line):
                         p.add_run(line[last_end:])
-
-                # ── Add a right-aligned branding footer ──
-                section = doc.sections[0]
-                footer = section.footer
-                p_footer = footer.paragraphs[0]
-                run = p_footer.add_run("— Generated with ALTORIX AI —")
-                run.italic = True
-                run.font.size = Pt(8)
-                p_footer.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-
-                # Save to BytesIO
                 word_file = io.BytesIO()
                 doc.save(word_file)
                 word_file.seek(0)
