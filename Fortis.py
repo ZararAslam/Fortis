@@ -140,7 +140,6 @@ if uploaded_file:
                 # ── Add a right-aligned branding footer ──
                 section = doc.sections[0]
                 footer = section.footer
-                footer.clear()  # remove any existing footer text
                 p_footer = footer.paragraphs[0]
                 run = p_footer.add_run("— Generated with ALTORIX AI —")
                 run.italic = True
