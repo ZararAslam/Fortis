@@ -39,6 +39,11 @@ def extract_text(file):
         return None
 
 if uploaded_file:
+    # If this is a new upload (different file name), clear the old “generated” flag
+    if st.session_state.get("last_upload") != uploaded_file.name:
+        st.session_state["last_upload"]      = uploaded_file.name
+        st.session_state.pop("report_generated", None)
+
     # 1️⃣ Extract client input once
     client_input = extract_text(uploaded_file)
     if not client_input:
