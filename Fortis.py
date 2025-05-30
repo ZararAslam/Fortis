@@ -111,7 +111,7 @@ if uploaded_file:
                 )
 
                 # ── Ensure exactly one blank line *after* each H2
-                     report_text = re.sub(
+                report_text = re.sub(
                      r"^(## .+)$",
                      r"\1\n",
                      report_text,
