@@ -110,13 +110,13 @@ if uploaded_file:
                 report_text, flags=re.MULTILINE
                 )
 
-                # ── Ensure a blank line after any numbered heading ──
-                report_text = re.sub(
-                    r'^(?P<h>\d+\.\s[^\n]+)$',
-                    r'\g<h>\n\n',
-                    report_text,
-                    flags=re.MULTILINE
-                )
+                # ── Ensure exactly one blank line *after* each H2
+                 report_text = re.sub(
+                     r"^(## .+)$",
+                     r"\1\n",
+                     report_text,
+                     flags=re.MULTILINE
+                 )
 
                 # Build the in-memory DOCX
                 doc = Document()
@@ -126,8 +126,17 @@ if uploaded_file:
                       # genuine Word heading, strip the "## "
                       doc.add_heading(line[3:].strip(), level=2)
                   elif line.startswith("- "):
-                      # bullet list
-                      doc.add_paragraph(line[2:].strip(), style="List Bullet")
+                     # bullet list with inline **bold**
+                     content = line[2:].strip()
+                     p = doc.add_paragraph(style="List Bullet")
+                     last = 0
+                     for m in bold_pattern.finditer(content):
+                         if m.start() > last:
+                             p.add_run(content[last:m.start()])
+                         run = p.add_run(m.group(1)); run.bold = True
+                         last = m.end()
+                     if last < len(content):
+                         p.add_run(content[last:])
                   elif not line.strip():
                       # blank line → keep a paragraph break
                       doc.add_paragraph()
