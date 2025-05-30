@@ -107,22 +107,25 @@ if uploaded_file:
         bold_pattern = re.compile(r"\*\*(.+?)\*\*")
 
         for line in report_text.splitlines():
+            # If this is a Markdown heading (## ), strip the ## and bold the whole line
+            if line.startswith("## "):
+                p = doc.add_paragraph()
+                run = p.add_run(line[3:].strip())
+                run.bold = True
+                continue
+            # Otherwise fall back to inline **…** detection
             p = doc.add_paragraph()
             last_end = 0
-
             for m in bold_pattern.finditer(line):
-                # add text before the **…**
                 if m.start() > last_end:
                     p.add_run(line[last_end:m.start()])
-                # add the bold portion
                 bold_text = m.group(1)
                 run = p.add_run(bold_text)
                 run.bold = True
                 last_end = m.end()
-
-            # add any remaining text after the last match
             if last_end < len(line):
                 p.add_run(line[last_end:])
+
 
 
         word_file = io.BytesIO()
