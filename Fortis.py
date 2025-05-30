@@ -110,6 +110,14 @@ if uploaded_file:
                     report_text, flags=re.MULTILINE
                 )
 
+                # ── Ensure a blank line after any numbered heading ──
+                report_text = re.sub(
+                    r'^(?P<h>\d+\.\s[^\n]+)$',
+                    r'\g<h>\n\n',
+                    report_text,
+                    flags=re.MULTILINE
+                )
+
                 # Build the in-memory DOCX
                 doc = Document()
                 bold_pattern = re.compile(r"\*\*(.+?)\*\*")
