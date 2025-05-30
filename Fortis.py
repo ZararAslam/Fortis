@@ -79,7 +79,25 @@ if uploaded_file:
         report_text = messages.data[0].content[0].text.value
 
         st.subheader("📄 Generated Report")
-        # Render the report as Markdown so **bold** gets formatted correctly
+
+        # ── Begin Markdown normalization ──
+        # (1) Turn any **Heading** lines into Markdown H2 headings
+        report_text = re.sub(
+            r"^\*\*(.+?)\*\*$",
+            r"## \1",
+            report_text,
+            flags=re.MULTILINE
+        )
+        # (2) Ensure exactly one blank line after each Markdown heading
+        report_text = re.sub(
+            r"^(## .+?)\s*\n+",
+            r"\1\n\n",
+            report_text,
+            flags=re.MULTILINE
+        )
+        # ── End Markdown normalization ──
+
+        # Render the processed text as Markdown (bold headings, proper paragraphs)
         st.markdown(report_text)
 
 
