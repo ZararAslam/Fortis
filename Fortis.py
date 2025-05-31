@@ -17,7 +17,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 st.set_page_config(page_title="Financial Report Generator", layout="centered")
 st.title("📊 Financial Report Generator")
 
-st.markdown("Upload your client data as a .txt, .csv, or .docx file. The assistant will generate a detailed financial advice report based on the contents.")
+st.markdown("Upload your client data as a '.txt', '.csv', or '.docx' file. The assistant will generate a detailed financial advice report based on the contents.")
 
 uploaded_file = st.file_uploader("Upload a file", type=["txt", "csv", "docx"])
 
