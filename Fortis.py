@@ -19,6 +19,7 @@ st.title("📊 Financial Report Generator")
 
 st.markdown(
     "⚠️ **Demo App — upload exactly one client’s data at a time.**  \n"
+    
     "Upload your client data as a `.txt`, `.csv`, or `.docx` file. The assistant will generate a detailed financial advice report based on the contents."
 )
 
