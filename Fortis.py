@@ -52,7 +52,7 @@ if uploaded_file:
 
     # 2️⃣ If we haven’t generated yet, show a Generate button
     if "report_generated" not in st.session_state:
-        if st.button("🚀 Generate Report"):
+        if st.button("Generate Report"):
             with st.spinner("Generating report…"):
                 # ← Paste your entire AI + regex + DOCX-building logic here —
                 #     everything from today_date up to storing in session_state. For example:
